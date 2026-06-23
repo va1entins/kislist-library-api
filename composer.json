@@ -1,4 +1,5 @@
 {
+    "name": "kislist/library-api",
     "type": "project",
     "license": "proprietary",
     "minimum-stability": "stable",
