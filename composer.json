@@ -25,7 +25,12 @@
             "symfony/runtime": true
         },
         "bump-after-update": true,
-        "sort-packages": true
+        "sort-packages": true,
+        "policy": {
+            "advisories": {
+                "ignore-id": ["PKSA-5r1g-c7b7-y1zg"]
+            }
+        }
     },
     "autoload": {
         "psr-4": {
@@ -70,6 +75,9 @@
     },
     "require-dev": {
         "doctrine/doctrine-fixtures-bundle": "^4.3",
+        "phpunit/phpunit": "^12.5",
+        "symfony/browser-kit": "7.2.*",
+        "symfony/css-selector": "7.2.*",
         "symfony/maker-bundle": "^1.67"
     }
 }
