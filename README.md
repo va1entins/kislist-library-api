@@ -23,6 +23,12 @@ The API will be available at: **http://localhost:8081/api/books**
 
 Database migrations run automatically on container startup (no manual step required).
 
+## Deployment
+
+The application is also deployed on Railway: **https://zooming-spontaneity-production-940e.up.railway.app/api/books**
+
+Locally, `docker compose up` runs 3 separate containers (PHP-FPM, Nginx, PostgreSQL) defined in `compose.yaml`. On Railway, the same `Dockerfile` builds a single service where Nginx and PHP-FPM run together via `supervisord`; PostgreSQL is provided as a managed Railway plugin instead of the local `database` container. The listening port is read from the `$PORT` environment variable at runtime, with a local fallback to `8080`.
+
 ## Project Structure
 
 ```

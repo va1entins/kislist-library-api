@@ -1,11 +1,14 @@
 FROM php:8.3-fpm-alpine
 
-# Instalacja zależności systemowych
+# Instalacja zależności systemowych (+ nginx, supervisor, envsubst do łączenia kontenerów)
 RUN apk add --no-cache \
     git \
     unzip \
     icu-dev \
-    postgresql-dev
+    postgresql-dev \
+    nginx \
+    supervisor \
+    gettext
 
 # Instalacja rozszerzeń PHP wymaganych przez Symfony + Doctrine (PostgreSQL)
 RUN docker-php-ext-install \
@@ -22,12 +25,24 @@ COPY . .
 
 RUN composer install --no-interaction --optimize-autoloader --no-scripts
 
-RUN chown -R www-data:www-data var
+# Generujemy plik autoload_runtime.php (potrzebny przez symfony/runtime),
+# pominięty wcześniej przez flagę --no-scripts
+RUN composer dump-autoload --optimize
+
+# Tworzymy katalog var (może nie istnieć w repo — Symfony domyślnie go ignoruje w .gitignore)
+RUN mkdir -p var/cache var/log && chown -R www-data:www-data var
+
+# Szablon konfiguracji Nginx (port podstawiany w runtime) i Supervisor
+COPY docker/nginx/default.conf.template /etc/nginx/http.d/default.conf.template
+COPY docker/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
+
 # Skrypt startowy odpowiedzialny za migracje bazy danych
 COPY docker/php/entrypoint.sh /usr/local/bin/entrypoint.sh
-RUN chmod +x /usr/local/bin/entrypoint.shin/entrypoint.sh
+RUN chmod +x /usr/local/bin/entrypoint.sh
 
-EXPOSE 9000
+# Domyślny port lokalny — Railway nadpisze własną wartością $PORT
+ENV PORT=8080
+EXPOSE 8080
 
 ENTRYPOINT ["entrypoint.sh"]
-CMD ["php-fpm"]
+CMD ["supervisord", "-c", "/etc/supervisor/conf.d/supervisord.conf"]
