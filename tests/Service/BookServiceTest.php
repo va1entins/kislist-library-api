@@ -19,6 +19,7 @@ final class BookServiceTest extends TestCase
     private BookRepository&MockObject $repository;
     private BookService $service;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->repository = $this->createMock(BookRepository::class);

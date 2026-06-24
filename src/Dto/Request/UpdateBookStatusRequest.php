@@ -25,8 +25,9 @@ final readonly class UpdateBookStatusRequest
             throw new InvalidRequestException('Pole "status" musi mieć wartość "borrowed" lub "available".');
         }
 
-        $isBorrowed = $status === 'borrowed';
+        $isBorrowed = 'borrowed' === $status;
 
+        // borrowerCardNumber wymagany tylko przy wypożyczeniu, przy zwrocie pole jest ignorowane
         if ($isBorrowed && !isset($data['borrowerCardNumber'])) {
             throw new InvalidRequestException('Pole "borrowerCardNumber" jest wymagane przy statusie "borrowed".');
         }

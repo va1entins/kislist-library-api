@@ -4,8 +4,9 @@ declare(strict_types=1);
 
 namespace App\Exception;
 
-class InvalidSerialNumberException extends \InvalidArgumentException implements ApiExceptionInterface
+final class InvalidSerialNumberException extends \InvalidArgumentException implements ApiExceptionInterface
 {
+    #[\Override]
     public function getStatusCode(): int
     {
         return 400;

@@ -12,9 +12,7 @@ final readonly class SerialNumber
     public function __construct(int $value)
     {
         if ($value < 100000 || $value > 999999) {
-            throw new \InvalidArgumentException(
-                sprintf('Numer seryjny musi być liczbą 6-cyfrową, otrzymano: %d', $value)
-            );
+            throw new \InvalidArgumentException(sprintf('Numer seryjny musi być liczbą 6-cyfrową, otrzymano: %d', $value));
         }
 
         $this->value = $value;

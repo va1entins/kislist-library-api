@@ -8,8 +8,9 @@ namespace App\Exception;
  * Wyjątek dla błędów parsowania/walidacji danych wejściowych
  * (niepoprawny JSON, brakujące pola w DTO).
  */
-class InvalidRequestException extends \InvalidArgumentException implements ApiExceptionInterface
+final class InvalidRequestException extends \InvalidArgumentException implements ApiExceptionInterface
 {
+    #[\Override]
     public function getStatusCode(): int
     {
         return 400;

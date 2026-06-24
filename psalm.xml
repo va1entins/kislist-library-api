@@ -1,0 +1,45 @@
+<?xml version="1.0"?>
+<psalm
+        errorLevel="4"
+        resolveFromConfigFile="true"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns="https://getpsalm.org/schema/config"
+        xsi:schemaLocation="https://getpsalm.org/schema/config vendor/vimeo/psalm/config.xsd"
+        findUnusedBaselineEntry="true"
+        findUnusedCode="true"
+>
+    <projectFiles>
+        <directory name="src" />
+        <directory name="tests" />
+        <ignoreFiles>
+            <directory name="vendor" />
+        </ignoreFiles>
+    </projectFiles>
+
+    <issueHandlers>
+        <!-- Klasy wywoływane przez framework/test runner (routing, CLI, event dispatcher, PHPUnit), nie przez bezpośrednie wywołanie PHP -->
+        <UnusedClass>
+            <errorLevel type="suppress">
+                <directory name="src/Controller" />
+                <directory name="src/DataFixtures" />
+                <directory name="src/EventSubscriber" />
+                <directory name="tests" />
+            </errorLevel>
+        </UnusedClass>
+
+        <!-- Konstruktory wywoływane przez Symfony autowiring (DI), nie bezpośrednio w kodzie -->
+        <PossiblyUnusedMethod>
+            <errorLevel type="suppress">
+                <file name="src/Repository/BookRepository.php" />
+                <file name="src/Service/BookService.php" />
+            </errorLevel>
+        </PossiblyUnusedMethod>
+
+        <!-- Quirk Psalm z generic ServiceEntityRepository<Book> — parametry są używane w ciele metody -->
+        <PossiblyUnusedParam>
+            <errorLevel type="suppress">
+                <file name="src/Repository/BookRepository.php" />
+            </errorLevel>
+        </PossiblyUnusedParam>
+    </issueHandlers>
+</psalm>

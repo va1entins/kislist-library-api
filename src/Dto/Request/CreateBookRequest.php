@@ -21,6 +21,7 @@ final readonly class CreateBookRequest
             throw new InvalidRequestException('Pola "id", "title" oraz "author" są wymagane.');
         }
 
+        // Akceptujemy int lub string cyfrowy — JSON może przekazać id jako liczbę lub string
         if (!is_int($data['id']) && !ctype_digit((string) $data['id'])) {
             throw new InvalidRequestException('Pole "id" musi być liczbą całkowitą.');
         }

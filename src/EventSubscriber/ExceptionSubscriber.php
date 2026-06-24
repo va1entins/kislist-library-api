@@ -17,6 +17,7 @@ use Symfony\Component\HttpKernel\KernelEvents;
  */
 final class ExceptionSubscriber implements EventSubscriberInterface
 {
+    #[\Override]
     public static function getSubscribedEvents(): array
     {
         return [
@@ -31,6 +32,8 @@ final class ExceptionSubscriber implements EventSubscriberInterface
         [$message, $statusCode] = match (true) {
             $exception instanceof ApiExceptionInterface => [$exception->getMessage(), $exception->getStatusCode()],
             $exception instanceof UniqueConstraintViolationException => ['Książka o podanym numerze seryjnym już istnieje', 409],
+            // Kolejność ma znaczenie: HttpExceptionInterface musi być sprawdzony przed default,
+            // inaczej natywne wyjątki Symfony (np. 404 dla nieznanej trasy) trafiają do 500
             $exception instanceof HttpExceptionInterface => [$exception->getMessage(), $exception->getStatusCode()],
             default => ['Wewnętrzny błąd serwera', 500],
         };
