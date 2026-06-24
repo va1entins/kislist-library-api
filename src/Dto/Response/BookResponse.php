@@ -32,6 +32,7 @@ final readonly class BookResponse
 
     /**
      * @param Book[] $books
+     *
      * @return self[]
      */
     public static function fromEntities(array $books): array

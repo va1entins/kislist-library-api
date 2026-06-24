@@ -21,6 +21,8 @@ final readonly class BookService
     ) {
     }
 
+    // Konwersja int -> VO i walidacja odbywają się w Service (nie w Entity),
+    // bo Doctrine mapuje kolumnę jako integer — VO nie jest typem Doctrine
     public function createBook(CreateBookRequest $request): Book
     {
         try {
@@ -79,7 +81,7 @@ final readonly class BookService
     {
         $book = $this->bookRepository->find($id);
 
-        if ($book === null) {
+        if (null === $book) {
             throw new BookNotFoundException($id);
         }
 
