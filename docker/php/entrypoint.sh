@@ -1,12 +1,12 @@
 #!/bin/sh
 set -e
 
-# Czekamy, aż baza danych będzie gotowa (depends_on z healthcheck już to zapewnia,
-# ale dajemy dodatkowy margines bezpieczeństwa)
-echo "Czekam na bazę danych..."
+# Podstawiamy $PORT w konfiguracji Nginx (lokalnie domyślnie 8080, na Railway nadpisane)
+echo "Podstawiam PORT=${PORT} w konfiguracji Nginx..."
+envsubst '$PORT' < /etc/nginx/http.d/default.conf.template > /etc/nginx/http.d/default.conf
 
 # Wykonujemy migracje automatycznie przy starcie kontenera
 php bin/console doctrine:migrations:migrate --no-interaction
 
-# Uruchamiamy główny proces (php-fpm)
+echo "Uruchamiam supervisord (nginx + php-fpm)..."
 exec "$@"
