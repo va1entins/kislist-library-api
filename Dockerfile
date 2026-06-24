@@ -25,7 +25,8 @@ COPY . .
 
 RUN composer install --no-interaction --optimize-autoloader --no-scripts
 
-RUN chown -R www-data:www-data var
+# Tworzymy katalog var (może nie istnieć w repo — Symfony domyślnie go ignoruje w .gitignore)
+RUN mkdir -p var/cache var/log && chown -R www-data:www-data var
 
 # Szablon konfiguracji Nginx (port podstawiany w runtime) i Supervisor
 COPY docker/nginx/default.conf.template /etc/nginx/http.d/default.conf.template
