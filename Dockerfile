@@ -25,6 +25,10 @@ COPY . .
 
 RUN composer install --no-interaction --optimize-autoloader --no-scripts
 
+# Generujemy plik autoload_runtime.php (potrzebny przez symfony/runtime),
+# pominięty wcześniej przez flagę --no-scripts
+RUN composer dump-autoload --optimize
+
 # Tworzymy katalog var (może nie istnieć w repo — Symfony domyślnie go ignoruje w .gitignore)
 RUN mkdir -p var/cache var/log && chown -R www-data:www-data var
 
