@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Dto\Request;
 
+use App\Exception\InvalidRequestException;
+
 final readonly class CreateBookRequest
 {
     public function __construct(
@@ -16,11 +18,11 @@ final readonly class CreateBookRequest
     public static function fromArray(array $data): self
     {
         if (!isset($data['id'], $data['title'], $data['author'])) {
-            throw new \InvalidArgumentException('Pola "id", "title" oraz "author" są wymagane.');
+            throw new InvalidRequestException('Pola "id", "title" oraz "author" są wymagane.');
         }
 
         if (!is_int($data['id']) && !ctype_digit((string) $data['id'])) {
-            throw new \InvalidArgumentException('Pole "id" musi być liczbą całkowitą.');
+            throw new InvalidRequestException('Pole "id" musi być liczbą całkowitą.');
         }
 
         return new self(

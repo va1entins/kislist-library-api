@@ -7,9 +7,7 @@ namespace App\Controller;
 use App\Dto\Request\CreateBookRequest;
 use App\Dto\Request\UpdateBookStatusRequest;
 use App\Dto\Response\BookResponse;
-use App\Exception\BookNotFoundException;
-use App\Exception\InvalidCardNumberException;
-use App\Exception\InvalidSerialNumberException;
+use App\Exception\InvalidRequestException;
 use App\Service\BookService;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -28,18 +26,8 @@ final class BookController
     #[Route('', methods: ['POST'])]
     public function create(Request $request): JsonResponse
     {
-        try {
-            $data = json_decode($request->getContent(), true, flags: JSON_THROW_ON_ERROR);
-            $createRequest = CreateBookRequest::fromArray($data);
-        } catch (\JsonException|\InvalidArgumentException $e) {
-            return new JsonResponse(['error' => $e->getMessage()], 400);
-        }
-
-        try {
-            $book = $this->bookService->createBook($createRequest);
-        } catch (InvalidSerialNumberException $e) {
-            return new JsonResponse(['error' => $e->getMessage()], 400);
-        }
+        $createRequest = CreateBookRequest::fromArray($this->decodeJson($request));
+        $book = $this->bookService->createBook($createRequest);
 
         return new JsonResponse(BookResponse::fromEntity($book)->toArray(), 201);
     }
@@ -47,11 +35,7 @@ final class BookController
     #[Route('/{id}', methods: ['DELETE'], requirements: ['id' => '\d+'])]
     public function remove(int $id): JsonResponse
     {
-        try {
-            $this->bookService->removeBook($id);
-        } catch (BookNotFoundException $e) {
-            return new JsonResponse(['error' => $e->getMessage()], 404);
-        }
+        $this->bookService->removeBook($id);
 
         return new JsonResponse(null, 204);
     }
@@ -71,22 +55,22 @@ final class BookController
     #[Route('/{id}/status', methods: ['PATCH'], requirements: ['id' => '\d+'])]
     public function updateStatus(int $id, Request $request): JsonResponse
     {
-        // Dekodowanie i walidacja danych wejściowych
-        try {
-            $data = json_decode($request->getContent(), true, flags: JSON_THROW_ON_ERROR);
-            $statusRequest = UpdateBookStatusRequest::fromArray($data);
-        } catch (\JsonException|\InvalidArgumentException $e) {
-            return new JsonResponse(['error' => $e->getMessage()], 400);
-        }
-
-        try {
-            $book = $this->bookService->updateStatus($id, $statusRequest);
-        } catch (BookNotFoundException $e) {
-            return new JsonResponse(['error' => $e->getMessage()], 404);
-        } catch (InvalidCardNumberException $e) {
-            return new JsonResponse(['error' => $e->getMessage()], 400);
-        }
+        $statusRequest = UpdateBookStatusRequest::fromArray($this->decodeJson($request));
+        $book = $this->bookService->updateStatus($id, $statusRequest);
 
         return new JsonResponse(BookResponse::fromEntity($book)->toArray(), 200);
+    }
+
+    /**
+     * Dekoduje JSON z requestu i mapuje błędy na InvalidRequestException
+     * (obsłużony przez globalny ExceptionSubscriber).
+     */
+    private function decodeJson(Request $request): array
+    {
+        try {
+            return json_decode($request->getContent(), true, flags: JSON_THROW_ON_ERROR);
+        } catch (\JsonException $e) {
+            throw new InvalidRequestException('Niepoprawny format JSON', previous: $e);
+        }
     }
 }
